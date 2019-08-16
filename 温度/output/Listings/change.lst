@@ -1,0 +1,49 @@
+C51 COMPILER V9.54   CHANGE                                                                05/17/2019 23:50:40 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE CHANGE
+OBJECT MODULE PLACED IN .\Objects\change.obj
+COMPILER INVOKED BY: E:\keil\C51\BIN\C51.EXE ..\program\change.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Lis
+                    -tings\change.lst) TABS(2) OBJECT(.\Objects\change.obj)
+
+line level    source
+
+   1          #include"change.h"
+   2          
+   3          unsigned char change(unsigned char *str,int dat)
+   4          {
+   5   1        char i = 0;
+   6   1        unsigned char len = 0;
+   7   1        unsigned char buf[5];
+   8   1        
+   9   1        if(dat<00)
+  10   1        {
+  11   2          dat = -dat;
+  12   2          *str++ = '-';
+  13   2          len++;
+  14   2        }
+  15   1        do{
+  16   2          buf[i++] = dat%10;
+  17   2          dat/=10;
+  18   2        }while(dat>0);
+  19   1        len+=i;
+  20   1        while(i-- > 0)
+  21   1          *str++ = buf[i] + '0';
+  22   1        *str = '\0';
+  23   1        
+  24   1        return len;
+  25   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    163    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      12
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

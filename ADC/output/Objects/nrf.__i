@@ -1,0 +1,1 @@
+"..\program\nrf.c" COMPACT OPTIMIZE (8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\nrf.lst) TABS (2) OBJECT(.\Objects\nrf.obj)

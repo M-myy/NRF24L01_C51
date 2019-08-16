@@ -1,0 +1,46 @@
+C51 COMPILER V9.54   MAIN                                                                  05/25/2019 23:51:06 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: E:\keil\C51\BIN\C51.EXE ..\program\main.c COMPACT OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT
+                    -(.\Listings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include<STC12C5A60S2.H>
+   2          #include"adc.h"
+   3          #include"nrf.h"
+   4          #include"lcd1602.h"
+   5          #include"delay.h"
+   6          
+   7          uchar TX_buf[3] = 0;    //准备发送的数据包
+   8          
+   9          main()
+  10          {
+  11   1        SPI_Init();
+  12   1        LcdInit();
+  13   1        ADC_Init();
+  14   1        LcdShow(0,0,"ADC:");
+  15   1        while(1)
+  16   1        {
+  17   2          tran();
+  18   2          LcdShow(4,0,TX_buf);    //显示发送数据，与接收机（主机）对比
+  19   2          NRF_TX_Mode(TX_buf);    //发送模式并发送数据包
+  20   2          while(CHECK_ACK());     //等待发送完成
+  21   2        }
+  22   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     54    ----
+   CONSTANT SIZE    =      5    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =      3    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

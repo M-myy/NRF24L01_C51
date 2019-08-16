@@ -1,0 +1,96 @@
+C51 COMPILER V9.54   MAIN                                                                  05/20/2019 22:21:00 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: E:\keil\C51\BIN\C51.EXE ..\program\main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listi
+                    -ngs\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /*******************************************************************************
+   2          *从机采取温度程序，单片机采取1-Wire总线与DS18B20进行通信，采集到温度数据之后通**
+   3          *过nRF24L01无线模块传递给主机，并在主机完成转换。                              *
+   4          *******************************************************************************/
+   5          #include<STC12C5A60S2.H>
+   6          #include<stdio.h>
+   7          #include"nrf.h"
+   8          #include"ds18b20.h"
+   9          #include"lcd1602.h"
+  10          #include"timer.h"
+  11          
+  12          bit ACK_R;
+  13          int temp,intT,decT;
+  14          extern bit flag;
+  15          char TX_buf[6];
+  16          
+  17          /*串口调试使用*/
+  18          /*void UART_Init(void)
+  19          {
+  20            SM0 = 0;
+  21            SM1 = 1;
+  22          
+  23            PCON &= 0x7F;
+  24            SCON = 0x50;
+  25            AUXR |= 0x04;
+  26            BRT = 0xE5;
+  27            AUXR |= 0x01;
+  28            AUXR |= 0x10;
+  29            EA = 1;
+  30            ES = 0;
+  31          }
+  32          
+  33          void sendbyte(unsigned char byte)
+  34          {
+  35            SBUF = byte;
+  36            while(TI == 0);
+  37            TI = 0;
+  38          }*/
+  39          
+  40          main()
+  41          {
+  42   1        EA = 1;
+  43   1        SPI_Init();
+  44   1        LcdInit();
+  45   1        Timer0_Init();
+  46   1        Enable_DS();
+  47   1        LcdShow(0,0,"T:");
+  48   1        while(1)
+  49   1        {
+  50   2          if(flag)                        //达到1秒更新温度
+  51   2          {
+  52   3            flag = 0;                     //重新清零标志位
+  53   3            ACK_R = Read_Temp(&temp);    //将读取到的16位温度值保存到形参中，并检测是否成功
+  54   3            if(ACK_R)                   //读取成功
+C51 COMPILER V9.54   MAIN                                                                  05/20/2019 22:21:00 PAGE 2   
+
+  55   3            {
+  56   4              intT = (temp >> 4);
+  57   4              decT = temp & 0xf;
+  58   4              decT = (decT*1000)/16;
+  59   4              sprintf(TX_buf,"%d.%d",intT,decT);
+  60   4              LcdShow(2,0,TX_buf);
+  61   4            }
+  62   3            else
+  63   3            LcdShow(2,0,"error");     
+  64   3            LcdShow(2,0,TX_buf);
+  65   3            NRF_TX_Mode(TX_buf);
+  66   3            while(CHECK_ACK());
+  67   3            Enable_DS();
+  68   3          }
+  69   2        }
+  70   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    178    ----
+   CONSTANT SIZE    =     15    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     12    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

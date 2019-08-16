@@ -1,0 +1,44 @@
+C51 COMPILER V9.54   PWM                                                                   05/25/2019 23:45:27 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE PWM
+OBJECT MODULE PLACED IN .\Objects\pwm.obj
+COMPILER INVOKED BY: E:\keil\C51\BIN\C51.EXE ..\program\pwm.c COMPACT OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(
+                    -.\Listings\pwm.lst) TABS(2) OBJECT(.\Objects\pwm.obj)
+
+line level    source
+
+   1          #include"pwm.h"
+   2          
+   3          extern unsigned char TX_buf[3];
+   4          
+   5          void PWM_Init(void)     //PWM≥ı ºªØ
+   6          {
+   7   1        CCON = 0;
+   8   1        CMOD = 0X02;
+   9   1        CCAPM0 = 0X42;
+  10   1        CCAPM1 = 0X42;
+  11   1        CL = 0;
+  12   1        CH = 0;
+  13   1        CR = 1;
+  14   1      }
+  15          
+  16          void PWM0_Set(void)    //…Ë÷√PWM0
+  17          {
+  18   1        CCAP0H = TX_buf;
+  19   1        CCAP0L = TX_buf;
+  20   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     26    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

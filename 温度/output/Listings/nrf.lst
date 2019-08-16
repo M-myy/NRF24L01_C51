@@ -1,0 +1,193 @@
+C51 COMPILER V9.54   NRF                                                                   05/20/2019 22:21:00 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE NRF
+OBJECT MODULE PLACED IN .\Objects\nrf.obj
+COMPILER INVOKED BY: E:\keil\C51\BIN\C51.EXE ..\program\nrf.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listin
+                    -gs\nrf.lst) TABS(2) OBJECT(.\Objects\nrf.obj)
+
+line level    source
+
+   1          #include"nrf.h"
+   2          
+   3          const uchar RX_ADDR0[] = {0x34,0x43,0x10,0x10,0x01};    //Í¨µÀ0½ÓÊÕµØÖ·
+   4          const uchar TX_ADDR0[] = {0x34,0x43,0x10,0x10,0x01};    //´Ó»ú0·¢ÉäµØÖ·
+   5          
+   6          /*³õÊ¼»¯NRF*/
+   7          void SPI_Init(void)
+   8          {
+   9   1        CSN = 1;
+  10   1        CE = 0;
+  11   1        SCK = 0;
+  12   1        IRQ = 1;
+  13   1      }
+  14          /*ÏòÊý¾Ý¼Ä´æÆ÷Ð´ÈëÒ»¸ö×Ö½ÚÊý¾Ý*/
+  15          uchar SPI_Write_byte(uchar dat)
+  16          { 
+  17   1        uchar bit_ctr;
+  18   1        for(bit_ctr=0;bit_ctr<8;bit_ctr++)
+  19   1        {
+  20   2          MOSI=(dat&0x80);
+  21   2          dat=(dat<<1);
+  22   2          SCK=1;
+  23   2          dat|=MISO;
+  24   2          SCK=0;
+  25   2        }
+  26   1        return dat;
+  27   1      }
+  28          /*Ïò¼Ä´æÆ÷ÖÐÐ´ÈëÒ»¸ö×Ö½ÚÊý¾Ý£¬regÎ»¼Ä´æÆ÷µØÖ·£¬datÎªÐ´ÈëÊý¾Ý*/
+  29          uchar SPI_Write_reg(uchar reg,uchar dat)
+  30          {
+  31   1        uchar status;    //¼Ä´æÆ÷×´Ì¬
+  32   1        
+  33   1        CSN = 0;         //À­µÍCSN,Ê¹ÄÜÍ¨ÐÅ
+  34   1        delay1ms();
+  35   1        status = SPI_Write_byte(reg);    //¼ì²â¼Ä´æÆ÷
+  36   1        SPI_Write_byte(dat);           //Ð´ÈëÊý¾Ý
+  37   1        CSN = 1;         //ÖØÐÂÊ¹ÄÜCSN,½ûÖ¹Í¨ÐÅ
+  38   1        
+  39   1        return status;    //·µ»Ø×´Ì¬
+  40   1      }
+  41          /*´Ó¼Ä´æÆ÷ÖÐ¶ÁÒ»¸ö×Ö½Ú,regÎª¼Ä´æÆ÷µØÖ·*/
+  42          uchar SPI_Read_byte(uchar reg)
+  43          {
+  44   1        uchar backdat;
+  45   1        
+  46   1        CSN = 0;
+  47   1        delay_ms(1);
+  48   1        SPI_Write_byte(reg);                   //Ð´ÈëµØÖ·
+  49   1        backdat = SPI_Write_byte(READ_REG);    //¶ÁÈ¡Êý¾Ý
+  50   1        CSN = 1;
+  51   1        
+  52   1        return backdat;
+  53   1      }
+  54          /*Ïò¼Ä´æÆ÷ÖÐÐ´ÈëÒ»¸öÊý¾Ý°ü*/
+C51 COMPILER V9.54   NRF                                                                   05/20/2019 22:21:00 PAGE 2   
+
+  55          uchar SPI_Write_buf(uchar reg,uchar *buf,uchar num)
+  56          {
+  57   1        uchar backdat,i;
+  58   1        
+  59   1        CSN = 0;                          //Ê¹ÄÜÍ¨ÐÅ    
+  60   1        delay1ms();
+  61   1        backdat = SPI_Write_byte(reg);    //Ð´Èë¼Ä´æÆ÷µØÖ·  
+  62   1        for(i=0;i<num;i++)                //Ð´Èënum¸ö×Ö½Ú
+  63   1        {
+  64   2          SPI_Write_byte(buf[i]);
+  65   2        }
+  66   1        CSN = 1;                          //½ûÖ¹Í¨ÐÅ
+  67   1        
+  68   1        return backdat;                   //·µ»Ø×´Ì¬Öµ
+  69   1      }
+  70          
+  71          /*´Ó¼Ä´æÆ÷ÖÐ¶ÁÈ¡Ò»¸öÊý¾Ý°ü,¶Áµ½µÄÊý¾Ý´æÔÚÐÎ²Î*bufÖÐ*/
+  72          uchar SPI_Read_buf(uchar reg,uchar *buf,uchar num)
+  73          {
+  74   1        uchar backdat,i;
+  75   1        
+  76   1        CSN = 0;                              //Ê¹ÄÜÍ¨ÐÅ
+  77   1        delay1ms();
+  78   1        backdat = SPI_Write_byte(reg);        //Ð´ÈëµØÖ·
+  79   1        for(i=0;i<num;i++)
+  80   1        {
+  81   2          buf[i] = SPI_Write_byte(READ_REG);    //¶ÁÈ¡num¸ö×Ö½Ú
+  82   2        }
+  83   1        CSN = 1;                              //½ûÖ¹Í¨ÐÅ
+  84   1        
+  85   1        return backdat;
+  86   1      }
+  87          
+  88          /*NRF½ÓÊÕÄ£Ê½³õÊ¼»¯*/
+  89          void NRF_RX_Mode(void)
+  90          {
+  91   1        CE = 0;
+  92   1        SPI_Write_reg(WRITE_REG+CONFIG,0X0D);
+  93   1        CE = 1;
+  94   1        delay10us();
+  95   1        
+  96   1        CE = 0;           //Ð´Êý¾ÝÇ°CE±ØÀ­µÍ
+  97   1        SPI_Write_buf(WRITE_REG+RX_ADDR_P0,TX_ADDR0,ADDR_WIDTH); //Êý¾ÝÍ¨µÀ0½ÓÊÕµØÖ·
+  98   1        SPI_Write_reg(WRITE_REG+EN_AA,0X01);                     //ÔÊÐíÊý¾ÝÍ¨µÀ0×Ô¶¯Ó¦´ð
+  99   1        SPI_Write_reg(WRITE_REG+EN_RXADDR,0X01);                 //½ÓÊÕÊý¾ÝÍ¨µÀ0ÔÊÐí
+ 100   1        SPI_Write_reg(WRITE_REG+RF_CH,CHANEL);                   //Ñ¡ÔñÉäÆµÍ¨µÀ
+ 101   1        SPI_Write_reg(WRITE_REG+RX_PW_P0,DATE_WIDTH);            //½ÓÊÕÊý¾ÝÍ¨µÀ0ÓÐÐ§¿í¶ÈÉèÖÃ
+ 102   1        SPI_Write_reg(WRITE_REG+RF_SETUP,0X07);                  //Êý¾Ý´«ÊäËÙÂÊ1Mb/S,·¢Éä¹¦ÂÊ0dBm,µÍÔëÉù·Å´óÆ÷ÔöÒ
+             -æ
+ 103   1        SPI_Write_reg(WRITE_REG+CONFIG,0X0F);                    //CRCÊ¹ÄÜ£¬16Î»CRCÐ£Ñé£¬ÉÏµç½ÓÊÕÄ£Ê½
+ 104   1        CE = 1;   //ÖØÐÂÀ­¸ßCEÒý½Å   
+ 105   1        delay1ms();
+ 106   1      }
+ 107          /*NRF·¢ÉäÄ£Ê½*/
+ 108          void NRF_TX_Mode(uchar *txbuf)
+ 109          {
+ 110   1        CE = 0;
+ 111   1        SPI_Write_reg(WRITE_REG+CONFIG,0X0D);
+ 112   1        CE = 1;
+ 113   1        delay10us();
+ 114   1        
+ 115   1        CE = 0;
+C51 COMPILER V9.54   NRF                                                                   05/20/2019 22:21:00 PAGE 3   
+
+ 116   1        SPI_Write_buf(WRITE_REG+TX_ADDR,TX_ADDR0,ADDR_WIDTH);   //·¢ÉäÍ¨µÀµØÖ·
+ 117   1        SPI_Write_buf(WRITE_REG+RX_ADDR_P0,TX_ADDR0,ADDR_WIDTH);//Êý¾ÝÍ¨µÀ0½ÓÊÕµØÖ·,»¹×÷ÎªÓ¦´ðÍ¨µÀ
+ 118   1        SPI_Write_buf(WR_TX_PLOAD,txbuf,DATE_WIDTH);
+ 119   1        
+ 120   1        SPI_Write_reg(WRITE_REG+EN_AA,0X01);                    //ÔÊÐíÊý¾ÝÍ¨µÀ0×Ô¶¯Ó¦´ð
+ 121   1        SPI_Write_reg(WRITE_REG+EN_RXADDR,0X01);                //½ÓÊÕÊý¾ÝÍ¨µÀ0ÔÊÐí
+ 122   1        SPI_Write_reg(WRITE_REG+SETUP_RETR,0X1f);               //µÈ´ý500+86us£¬×Ô¶¯ÖØ·¢15´Î
+ 123   1        SPI_Write_reg(WRITE_REG+RF_CH,CHANEL);                  //Ñ¡ÔñÉäÆµÍ¨µÀ
+ 124   1        SPI_Write_reg(WRITE_REG+RF_SETUP,0X07);                 //Êý¾Ý´«ÊäËÙÂÊ1Mb/S,·¢Éä¹¦ÂÊ0dBm£¨×î´ó£©,µÍÔëÉù·Å
+             -´óÆ÷ÔöÒæ
+ 125   1        SPI_Write_reg(WRITE_REG+CONFIG,0X0E);                   //RCÊ¹ÄÜ£¬16Î»CRCÐ£Ñé£¬ÉÏµç·¢ÉäÄ£Ê½
+ 126   1        CE = 1;
+ 127   1        delay1ms();
+ 128   1      }
+ 129          
+ 130          uchar CHECK_ACK(void)
+ 131          {
+ 132   1        uchar sta;
+ 133   1        while(IRQ);
+ 134   1        sta = SPI_Read_byte(READ_REG+STATUS);
+ 135   1        if((sta&TX_OK)||(sta&MAX_TX))
+ 136   1        {
+ 137   2          SPI_Write_reg(WRITE_REG+STATUS,sta);
+ 138   2          CSN = 0;
+ 139   2          SPI_Write_byte(FLUSH_TX);
+ 140   2          CSN = 1;
+ 141   2          IRQ = 1;
+ 142   2          return 0;
+ 143   2        }
+ 144   1        IRQ = 1;
+ 145   1        return 1;
+ 146   1      }
+ 147          /*NRF¶ÁÈ¡Êý¾Ý°ü*/
+ 148          void NRF_RxPacket(uchar *rxbuf)
+ 149          {
+ 150   1        uchar sta;
+ 151   1        sta = SPI_Read_byte(STATUS);
+ 152   1        if(sta&RX_OK)
+ 153   1        {
+ 154   2          CE = 0;
+ 155   2          SPI_Read_buf(RD_RX_PLOAD,rxbuf,DATE_WIDTH);
+ 156   2          SPI_Write_reg(WRITE_REG+STATUS,sta);
+ 157   2          CSN = 0;
+ 158   2          SPI_Write_byte(FLUSH_RX);
+ 159   2          CSN = 1;
+ 160   2          IRQ = 1;
+ 161   2        }
+ 162   1        IRQ = 1;
+ 163   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    461    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     10      20
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

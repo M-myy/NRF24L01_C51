@@ -1,0 +1,72 @@
+C51 COMPILER V9.54   ADC                                                                   05/25/2019 23:42:43 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE ADC
+OBJECT MODULE PLACED IN .\Objects\adc.obj
+COMPILER INVOKED BY: E:\keil\C51\BIN\C51.EXE ..\program\adc.c COMPACT OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(
+                    -.\Listings\adc.lst) TABS(2) OBJECT(.\Objects\adc.obj)
+
+line level    source
+
+   1          #include"adc.h"
+   2          
+   3          extern unsigned char TX_buf[3];    //准备发送的数据包
+   4          
+   5          /**
+   6          *函数名：ADC初始化函数
+   7          *形参：无
+   8          *返回值：无
+   9          */
+  10          void ADC_Init(void)
+  11          {
+  12   1        P1ASF = 0X01;    //P1^0口作为ADC模拟功能A/D使用
+  13   1        ADC_RES = 0;    //清空ADC的A/D转换结果寄存器
+  14   1        ADC_CONTR = 0X88;    //打开A/D转换器电源，启动模数转换器，清0中断标志位，540个时钟周期转换一次
+  15   1        AUXR1 = 0X00;    //10位ADC转化结果的高八位存放在ADC_RES中，低2位存在ADC_RESL中
+  16   1        delay_us(1);
+  17   1      }
+  18          
+  19          /**
+  20          *函数名：获取ADC数值
+  21          *形参：无
+  22          *返回值：转换得到的ADC数值
+  23          */
+  24          unsigned char Get_ADC_Res(void)
+  25          {
+  26   1        unsigned char res;
+  27   1        ADC_CONTR = 0X88;    //打开A/D转换器电源，启动模数转换器，清0中断标志位，540个时钟周期转换一次
+  28   1        delay_us(1);
+  29   1        while(!(ADC_CONTR&0X10));    //等待转换完成中断标志位置位
+  30   1        ADC_CONTR &= 0XEF;    //清零中断标志位
+  31   1        res = ADC_RES;    //获取高八位结果
+  32   1        return res;    //返回数值
+  33   1      }
+  34          
+  35          /**
+  36          *函数名：转换ADC数值
+  37          *形参：无
+  38          *返回值：将ADC数值转换存储
+  39          */
+  40          void tran(void)
+  41          {
+  42   1        unsigned char dat = Get_ADC_Res();  //获取ADC数值
+  43   1        TX_buf[0] = dat/100 + '0';     //取百位
+  44   1        TX_buf[1] = (dat%100)/10 + '0';  //取十位
+  45   1        TX_buf[2] = dat%10 + '0';    //取个位
+  46   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     78    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+C51 COMPILER V9.54   ADC                                                                   05/25/2019 23:42:43 PAGE 2   
+
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

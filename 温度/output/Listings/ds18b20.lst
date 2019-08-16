@@ -1,0 +1,115 @@
+C51 COMPILER V9.54   DS18B20                                                               05/20/2019 22:21:00 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE DS18B20
+OBJECT MODULE PLACED IN .\Objects\ds18b20.obj
+COMPILER INVOKED BY: E:\keil\C51\BIN\C51.EXE ..\program\ds18b20.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Li
+                    -stings\ds18b20.lst) TABS(2) OBJECT(.\Objects\ds18b20.obj)
+
+line level    source
+
+   1          #include"ds18b20.h"
+   2          
+   3          bit DS18B20_Init(void)   //初始化1-Wire总线，并检测DS18B20是否存在，通知其做好准备
+   4          {
+   5   1        bit ACK;
+   6   1        
+   7   1        EA = 0;            //关闭总中断，防止初始化过程被打断
+   8   1        DS_IO = 0;         //给予复位脉冲
+   9   1        delay500us();
+  10   1        DS_IO = 1;         
+  11   1        delay60us();     //上拉电阻把引脚电平拉高
+  12   1        ACK = DS_IO;       //采集存在脉冲ACK =0
+  13   1        while(!DS_IO);     //等待直到没有存在脉冲
+  14   1        EA = 1;            //重新开启总中断
+  15   1        
+  16   1        return ~ACK;     //返回ACK,~ACK=1则成功
+  17   1      }
+  18          
+  19          bit Enable_DS(void)    //启动一次温度转换
+  20          {
+  21   1        bit ACK;
+  22   1        
+  23   1        ACK = DS18B20_Init();
+  24   1        if(ACK)
+  25   1        {
+  26   2          Write_DS(SKIPROM);    //由于总线上只有一个器件，故跳过检测
+  27   2          Write_DS(CONVERT);    //启动温度转换指令
+  28   2        }
+  29   1        return ACK;
+  30   1      }
+  31          
+  32          void Write_DS(unsigned char dat)    //向DS18B20写入数据
+  33          {
+  34   1        unsigned char mask;
+  35   1        
+  36   1        EA = 0;                          //关闭总中断防止干扰 
+  37   1        for(mask=0x01;mask!=0;mask<<=1)    //从最低位开始读取
+  38   1        {
+  39   2          DS_IO = 0;         //拉低通信引脚
+  40   2          delay2us();       //至少1微秒后才可向控制器写入1，故延时2微秒
+  41   2          if((mask&dat)==0)    //检测写入数据        
+  42   2          {DS_IO = 0;}
+  43   2          else 
+  44   2          {DS_IO = 1;}
+  45   2          delay60us();      //延时DS18B20采样时间
+  46   2          DS_IO = 1;         //重新拉高通信引脚，为下次写入做准备
+  47   2        }
+  48   1        EA = 1;                         //重新开启总中断
+  49   1      }
+  50          
+  51          unsigned char Read_DS(void)    //读取DS18B20数据      
+  52          {
+  53   1        unsigned char mask,dat;
+  54   1        
+C51 COMPILER V9.54   DS18B20                                                               05/20/2019 22:21:00 PAGE 2   
+
+  55   1        EA = 0;
+  56   1        for(mask=0x01;mask!=0;mask<<=1)    
+  57   1        {
+  58   2          DS_IO = 0;                       //拉低通信引脚
+  59   2          delay2us();
+  60   2          DS_IO = 1;                       //拉高通信引脚
+  61   2          delay2us();
+  62   2          if(!DS_IO)
+  63   2            dat &= ~mask;                  
+  64   2          else
+  65   2            dat |= mask;
+  66   2          delay60us();
+  67   2        }
+  68   1        EA = 1;
+  69   1        
+  70   1        return dat;                        //返回读取到的数据
+  71   1      }
+  72          
+  73          bit Read_Temp(int *temp)    //读取温度，返回值为是否成功，并将读到的值储存到形参中
+  74          {
+  75   1        bit ACK;
+  76   1        unsigned char MSB,LSB;
+  77   1        
+  78   1        ACK = DS18B20_Init();           //检测是否转换成功
+  79   1        if(ACK)
+  80   1        {
+  81   2          Write_DS(SKIPROM);         //跳过检测
+  82   2          Write_DS(READ);            //读命令
+  83   2          LSB = Read_DS();           //读数据的时候先读到的是低字节后是高字节，直到读完为止
+  84   2          MSB = Read_DS();
+  85   2          *temp = ((int)MSB<<8)+LSB;    //高字节左移八位，与低字节组成16位数据
+  86   2        }
+  87   1        
+  88   1        return ACK;                  //读取成功应答位
+  89   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    193    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       8
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       3
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

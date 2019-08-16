@@ -1,0 +1,25 @@
+C51 COMPILER V9.54   1WIRE                                                                 05/01/2019 17:58:35 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE 1WIRE
+OBJECT MODULE PLACED IN .\Objects\1Wire.obj
+COMPILER INVOKED BY: E:\keil\C51\BIN\C51.EXE ..\program\1Wire.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\1Wire.lst) TABS(2) OBJECT(.\Objects\1Wire.obj)
+
+line level    source
+
+   1          #include"1Wire.h"
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

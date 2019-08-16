@@ -1,0 +1,53 @@
+C51 COMPILER V9.54   TIMER                                                                 05/20/2019 22:21:00 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE TIMER
+OBJECT MODULE PLACED IN .\Objects\timer.obj
+COMPILER INVOKED BY: E:\keil\C51\BIN\C51.EXE ..\program\timer.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\List
+                    -ings\timer.lst) TABS(2) OBJECT(.\Objects\timer.obj)
+
+line level    source
+
+   1          #include"timer.h"
+   2          
+   3          bit flag = 0;    //定时1S标志位
+   4          
+   5          void Timer0_Init(void)    //定时器0初始化
+   6          {
+   7   1        AUXR |= 0x80;
+   8   1        TMOD &= 0xF0;
+   9   1        TMOD |= 0x01;
+  10   1        TL0 = 0x66;
+  11   1        TH0 = 0x7E;
+  12   1        TF0 = 0;
+  13   1        ET0 = 1;
+  14   1        TR0 = 1;        //启动定时器0
+  15   1      }
+  16          
+  17          void Interrupt_Timer0() interrupt 1
+  18          {
+  19   1        static unsigned int cnt = 0;
+  20   1        
+  21   1        TL0 = 0X66;    //重新装载初值
+  22   1        TH0 = 0X7E;
+  23   1        cnt++;
+  24   1        if(cnt>=1000)    //检测是否达到1秒
+  25   1        {
+  26   2          cnt = 0;     //计数值清零
+  27   2          flag = 1;    //标志位置位
+  28   2        }
+  29   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     62    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,1 @@
+"..\program\adc.c" COMPACT OPTIMIZE (8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\adc.lst) TABS (2) OBJECT(.\Objects\adc.obj)

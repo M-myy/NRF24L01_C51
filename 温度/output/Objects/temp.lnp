@@ -1,0 +1,8 @@
+".\Objects\main.obj",
+".\Objects\ds18b20.obj",
+".\Objects\delay.obj",
+".\Objects\nrf.obj",
+".\Objects\lcd1602.obj",
+".\Objects\timer.obj" 
+TO ".\Objects\temp" 
+PRINT(".\Listings\temp.m51") RAMSIZE(256) 

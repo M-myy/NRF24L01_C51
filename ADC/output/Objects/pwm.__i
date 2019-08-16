@@ -1,0 +1,1 @@
+"..\program\pwm.c" COMPACT OPTIMIZE (8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\pwm.lst) TABS (2) OBJECT(.\Objects\pwm.obj)
